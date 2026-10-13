@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Camera Streamer (Sender)</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/sender.css">
+</head>
+<body class="sender-body">
+
+  <div class="sender-container">
+    
+    <!-- Viewport Video Stream -->
+    <div class="video-viewport">
+      <video id="localVideo" playsinline autoplay muted></video>
+      <div id="focusRing" class="focus-ring"></div>
+    </div>
+
+    <!-- HUD Overlay Layer -->
+    <div class="hud-layer">
+      
+      <!-- Top Status & Actions Bar -->
+      <div class="hud-top-bar">
+        <div class="hud-pill-group">
+          <a href="/" class="glass-hud-btn" title="Back to Hub" style="text-decoration: none;">
+            <svg class="icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+          </a>
+          <div class="glass-pill status-pill">
+            <span class="status-dot waiting" id="p2p-status-dot"></span>
+            <span id="p2p-status-text">Ready</span>
+          </div>
+          <div class="glass-pill status-pill" id="receiver-pill" style="display: none;">
+            <svg class="icon" style="width: 14px; height: 14px;" viewBox="0 0 24 24">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <span id="receiver-count-num">0</span>
+          </div>
+        </div>
+
+        <div class="hud-actions">
+          <!-- Torch / Flashlight Toggle (Environment Camera Only) -->
+          <button id="btn-torch" class="glass-hud-btn disabled" title="Toggle Flashlight">
+            <svg class="icon" viewBox="0 0 24 24">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+            </svg>
+          </button>
+
+          <!-- Flip Camera (Front / Rear) -->
+          <button id="btn-flip" class="glass-hud-btn" title="Flip Camera">
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M20 16.2A4.5 4.5 0 0 0 21 12a4.5 4.5 0 0 0-4.5-4.5H6.8"/>
+              <polyline points="10 4 6 7.5 10 11"/>
+              <path d="M4 7.8A4.5 4.5 0 0 0 3 12a4.5 4.5 0 0 0 4.5 4.5h9.7"/>
+              <polyline points="14 20 18 16.5 14 13"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Bottom Controls -->
+      <div class="hud-bottom-bar">
+        
+        <!-- Live Telemetry Strip -->
+        <div class="telemetry-strip">
+          <div class="telemetry-item">
+            <span>RES:</span>
+            <span class="telemetry-val" id="hud-resolution">--</span>
+          </div>
+          <div class="telemetry-item">
+            <span>FPS:</span>
+            <span class="telemetry-val" id="hud-fps">--</span>
+          </div>
+          <div class="telemetry-item" id="wake-lock-item" style="color: #10b981;">
+            <span>☀️ WAKELOCK</span>
+          </div>
+        </div>
+
+        <!-- Main Controls Bar -->
+        <div class="main-controls-card">
+          <!-- Resolution Select -->
+          <select id="select-resolution" class="selector-pill">
+            <option value="1080">1080p (FHD)</option>
+            <option value="720" selected>720p (HD)</option>
+            <option value="480">480p (Fast)</option>
+          </select>
+
+          <!-- Stream Start/Stop -->
+          <button id="btn-stream" class="btn-stream-toggle">
+            <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span id="btn-stream-label">Start Stream</span>
+          </button>
+
+          <!-- Audio / Mic Toggle -->
+          <button id="btn-mic" class="glass-hud-btn" title="Toggle Microphone">
+            <svg class="icon" id="mic-icon" viewBox="0 0 24 24">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="23"/>
+              <line x1="8" y1="23" x2="16" y2="23"/>
+            </svg>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Permission/Error Modal -->
+    <div id="error-modal" class="modal-overlay">
+      <div class="modal-content">
+        <h3 style="color: #ef4444; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Camera Permission Needed
+        </h3>
+        <p id="error-message" style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px;">
+          Unable to access your camera. Make sure you tapped 'Allow' when your browser prompted for camera permission.
+        </p>
+        <div style="display: flex; gap: 10px; flex-direction: column;">
+          <button class="btn btn-primary" style="width: 100%;" onclick="retryCamera()">Try Again</button>
+          <button class="btn btn-outline" style="width: 100%;" onclick="startSimulatedCamera()">Use Virtual Test Camera</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/sender.js"></script>
+</body>
+</html>

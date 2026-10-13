@@ -1,0 +1,24 @@
+{
+  "name": "webrtc-streamer",
+  "version": "1.0.0",
+  "description": "Local WebRTC video streaming web app over HTTPS with Socket.io",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "webrtc",
+    "streaming",
+    "socketio",
+    "camera"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.3.0",
+    "qrcode": "^1.5.4",
+    "selfsigned": "^5.5.0",
+    "socket.io": "^4.8.4"
+  }
+}
